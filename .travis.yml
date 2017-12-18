@@ -2,24 +2,38 @@ sudo: false
 
 language: android
 jdk: oraclejdk8
-
-android:
-  components:
-  - platform-tools
-  - tools
-  - build-tools-23.0.3
-  - android-23
-  - sys-img-armeabi-v7a-android-24
-
-# Emulator Management: Create, Start and Wait
-before_script:
-  - echo no | android create avd --force -n test -t android-23 --abi armeabi-v7a 
-  - emulator -avd test -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
+notifications:
+  email: false
 
 before_install:
 - chmod +x gradlew
+
+env:
+  global:
+  - ANDROID_API_LEVEL=23
+  - ANDROID_BUILD_TOOLS_VERSION=23.0.3
+  - ANDROID_EMU_API_LEVEL=22
+  - ANDROID_ABI=armeabi-v7a
+  - ADB_INSTALL_TIMEOUT=5 # minutes (2 minutes by default)
+  - QEMU_AUDIO_DRV=none # Remove audio
+
+android:
+  components:
+  - tools
+  - platform-tools
+  - tools
+  - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+  - android-$ANDROID_API_LEVEL
+  - android-$ANDROID_EMU_API_LEVEL
+  - extra-android-support
+  - sys-img-$ANDROID_ABI-google_apis-$ANDROID_EMU_API_LEVEL
+
+# Emulator Management: Create, Start and Wait
+before_script:
+  - echo no | android create avd --force -n test -t android-$ANDROID_EMU_API_LEVEL --abi google_apis/$ANDROID_ABI
+  - emulator -avd test -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
 
 script:
 - "./gradlew clean build connectedAndroidTest -PdisablePreDex --stacktrace"
