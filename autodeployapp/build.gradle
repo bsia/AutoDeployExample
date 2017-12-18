@@ -40,6 +40,8 @@ android {
     targetSdkVersion 23
     versionCode buildNumber
     versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -53,6 +55,9 @@ android {
 
 dependencies {
   testCompile 'junit:junit:4.12'
+  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+  })
 }
 
 // Change apk name.
